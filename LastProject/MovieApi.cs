@@ -20,7 +20,6 @@ namespace LastProject
         private static async Task<T> SendApi<T>(string url)
         {
             string apiKey = GetMovieApiKey();
-            // Добавляем ключ к запросу. Проверяем, есть ли уже параметры в URL
             string separator = url.Contains("?") ? "&" : "?";
             string requestUrl = $"{url}{separator}api_key={apiKey}&language=ru-RU";
 
@@ -28,13 +27,11 @@ namespace LastProject
 
             if (response.IsSuccessStatusCode)
             {
-                // Используем CaseInsensitive для надежности
                 var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
                 return await response.Content.ReadFromJsonAsync<T>(options);
             }
             else
             {
-                // Логируем или выбрасываем ошибку
                 throw new Exception($"Error accessing API: {response.StatusCode}");
             }
         }
@@ -65,9 +62,9 @@ namespace LastProject
             return await SendApi<Movie>($"https://api.themoviedb.org/3/movie/{id}");
         }
 
+        
         public static async Task<MoviesResponse> GetSimilarMovies(int movieId)
         {
-            // Берем только первую страницу похожих
             return await SendApi<MoviesResponse>($"https://api.themoviedb.org/3/movie/{movieId}/similar");
         }
     }

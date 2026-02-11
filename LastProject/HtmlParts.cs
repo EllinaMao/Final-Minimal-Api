@@ -72,11 +72,11 @@ namespace LastProject
                                     <a href="/" class="active">Все</a>
             """);
 
-            // Выводим несколько категорий как пример (можно сделать полноценный select)
             foreach (var g in allGenres.Take(5))
             {
-                string activeClass = currentGenreId == g.Id ? "style='color:#ff55a5'" : "";
-                sb.Append($"<a href='/category?categoryId={g.Id}' {activeClass} style='margin-left:15px;'>{g.Name}</a>");
+                string colorStyle = (currentGenreId == g.Id) ? "color:#ff55a5;" : "";
+
+                sb.Append($"<a href='/category?categoryId={g.Id}' style='margin-left:15px; {colorStyle}'>{g.Name}</a>");
             }
 
             sb.Append("""
@@ -89,14 +89,12 @@ namespace LastProject
                     <div class="row">
             """);
 
-            // Цикл по фильмам
             foreach (var movie in moviesData.Results)
             {
                 string imagePath = string.IsNullOrEmpty(movie.Poster_Path)
-                    ? "img/covers/cover.jpg" // Заглушка, если нет фото
+                    ? "img/covers/cover.jpg"
                     : $"{MovieApi.ImageBaseUrl}{movie.Poster_Path}";
 
-                // Находим название жанра (первого из списка)
                 string genreName = "Unknown";
                 if (movie.Genre_Ids.Count > 0)
                 {
@@ -129,7 +127,7 @@ namespace LastProject
             return sb.ToString();
         }
 
-        // Пагинация
+
         public static string GetHtmlPages(int currentPage, int totalPages, string action, string query = "", int? categoryId = null)
         {
             if (totalPages <= 1) return "";
@@ -137,17 +135,37 @@ namespace LastProject
             var sb = new StringBuilder();
             sb.Append("<div class='container'><div class='row'><div class='col-12'><ul class='paginator'>");
 
-            // Кнопка назад
             if (currentPage > 1)
             {
                 string prevLink = BuildLink(action, currentPage - 1, query, categoryId);
                 sb.Append($"<li class='paginator__item paginator__item--prev'><a href='{prevLink}'><</a></li>");
             }
 
-            // Текущая страница
-            sb.Append($"<li class='paginator__item paginator__item--active'><a href='#'>{currentPage}</a></li>");
+            int range = 2;
+            int startPage = Math.Max(1, currentPage - range);
+            int endPage = Math.Min(totalPages, currentPage + range);
 
-            // Кнопка вперед
+            if (endPage - startPage < range * 2)
+            {
+                if (startPage == 1)
+                    endPage = Math.Min(totalPages, startPage + range * 2);
+                else if (endPage == totalPages)
+                    startPage = Math.Max(1, endPage - range * 2);
+            }
+
+            for (int i = startPage; i <= endPage; i++)
+            {
+                if (i == currentPage)
+                {
+                    sb.Append($"<li class='paginator__item paginator__item--active'><a href='#'>{i}</a></li>");
+                }
+                else
+                {
+                    string link = BuildLink(action, i, query, categoryId);
+                    sb.Append($"<li class='paginator__item'><a href='{link}'>{i}</a></li>");
+                }
+            }
+
             if (currentPage < totalPages)
             {
                 string nextLink = BuildLink(action, currentPage + 1, query, categoryId);
@@ -160,9 +178,8 @@ namespace LastProject
 
         private static string BuildLink(string action, int page, string query, int? categoryId)
         {
-            // Формируем URL в зависимости от параметров
             string url = $"/{action}?page={page}";
-            if (!string.IsNullOrEmpty(query)) url += $"&query={query}"; // Для поиска нужен параметр query, а не searchQuery
+            if (!string.IsNullOrEmpty(query)) url += $"&query={query}"; 
             if (categoryId.HasValue) url += $"&categoryId={categoryId}";
             return url;
         }
@@ -211,7 +228,6 @@ namespace LastProject
             </section>
             """);
 
-            // Блок похожих фильмов (5 штук)
             if (similar != null && similar.Results.Count > 0)
             {
                 sb.Append("""
@@ -246,7 +262,6 @@ namespace LastProject
             return sb.ToString();
         }
 
-        // Метод 404
         public static string GetNotFoundPage()
         {
             return """
@@ -258,10 +273,9 @@ namespace LastProject
                 """;
         }
 
-        // Стили
+       
         static string GetStyleSection()
         {
-            // Используем пути к CSS, которые есть в ваших файлах
             return """
                 <link rel="stylesheet" href="/css/bootstrap.min.css">
                 <link rel="stylesheet" href="/css/main.css">

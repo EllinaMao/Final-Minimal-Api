@@ -3,9 +3,7 @@ using LastProject;
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
-app.UseStaticFiles(); // Важно для загрузки CSS/JS/IMG из папки wwwroot
-
-// Главная страница - Популярные фильмы
+app.UseStaticFiles(); 
 app.Map("/", async (HttpContext context) =>
 {
     int currentPage = 1;
@@ -28,10 +26,9 @@ app.Map("/", async (HttpContext context) =>
     }
 });
 
-// Страница категорий
 app.Map("/category", async (HttpContext context) =>
 {
-    int id = 28; // Action по умолчанию
+    int id = 28; 
     int currentPage = 1;
     
     if (int.TryParse(context.Request.Query["categoryId"], out int newId)) id = newId;
@@ -54,20 +51,19 @@ app.Map("/category", async (HttpContext context) =>
     }
 });
 
-// Поиск
+
 app.Map("/search", async (HttpContext context) =>
 {
     var allCategories = await MovieApi.GetGenreList();
     string query = "";
     int currentPage = 1;
 
-    // Если POST (отправка формы из хедера)
     if (context.Request.Method == "POST")
     {
         var form = await context.Request.ReadFormAsync();
         query = form["searchQuery"];
     }
-    // Если GET (пагинация поиска)
+
     else 
     {
         query = context.Request.Query["query"];
