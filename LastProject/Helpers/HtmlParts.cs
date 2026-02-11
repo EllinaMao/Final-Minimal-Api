@@ -1,6 +1,7 @@
-﻿using System.Text;
+﻿using LastProject.Models;
+using System.Text;
 
-namespace LastProject
+namespace LastProject.Helpers
 {
     public static class HtmlParts
     {

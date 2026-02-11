@@ -1,4 +1,4 @@
-using LastProject;
+using LastProject.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
@@ -91,7 +91,8 @@ app.Map("/search", async (HttpContext context) =>
     }
 });
 
-// Детальная страница
+
+
 app.Map("/details/{movieId}", async (string movieId, HttpContext context) =>
 {
     if (int.TryParse(movieId, out int id))

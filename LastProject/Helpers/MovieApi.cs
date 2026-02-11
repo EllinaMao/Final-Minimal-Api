@@ -1,6 +1,7 @@
-﻿using System.Text.Json;
+﻿using LastProject.Models;
+using System.Text.Json;
 
-namespace LastProject
+namespace LastProject.Helpers
 {
     public static class MovieApi
     {
