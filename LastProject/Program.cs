@@ -3,7 +3,7 @@ using LastProject;
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
-app.UseStaticFiles(); 
+app.UseStaticFiles(); // Важно для загрузки CSS/JS/IMG из папки wwwroot
 
 // Главная страница - Популярные фильмы
 app.Map("/", async (HttpContext context) =>
@@ -15,7 +15,7 @@ app.Map("/", async (HttpContext context) =>
     {
         var allCategories = await MovieApi.GetGenreList();
         var popularMovies = await MovieApi.GetPopularMovies(currentPage);
-
+        
         await context.Response.WriteAsync(HtmlParts.GetHtmlPage($"""
         {HtmlParts.GetMoviesSection(popularMovies, allCategories)}
         {HtmlParts.GetHtmlPages(currentPage, popularMovies.Total_Pages, action: "")}
@@ -33,7 +33,7 @@ app.Map("/category", async (HttpContext context) =>
 {
     int id = 28; // Action по умолчанию
     int currentPage = 1;
-
+    
     if (int.TryParse(context.Request.Query["categoryId"], out int newId)) id = newId;
     if (int.TryParse(context.Request.Query["page"], out int pageNumber)) currentPage = pageNumber;
 
@@ -41,7 +41,7 @@ app.Map("/category", async (HttpContext context) =>
     {
         var allCategories = await MovieApi.GetGenreList();
         var movies = await MovieApi.GetMoviesByGenre(genreId: id, page: currentPage);
-
+        
         await context.Response.WriteAsync(HtmlParts.GetHtmlPage($"""
         {HtmlParts.GetMoviesSection(movies, allCategories, id)}
         {HtmlParts.GetHtmlPages(currentPage, movies.Total_Pages, action: "category", categoryId: id)}
@@ -68,7 +68,7 @@ app.Map("/search", async (HttpContext context) =>
         query = form["searchQuery"];
     }
     // Если GET (пагинация поиска)
-    else
+    else 
     {
         query = context.Request.Query["query"];
         if (int.TryParse(context.Request.Query["page"], out int p)) currentPage = p;
@@ -104,17 +104,17 @@ app.Map("/details/{movieId}", async (string movieId, HttpContext context) =>
         {
             var currentMovie = await MovieApi.GetMovieById(id);
             var similarMovies = await MovieApi.GetSimilarMovies(id);
-
+            
             if (currentMovie != null)
             {
                 await context.Response.WriteAsync(HtmlParts.GetHtmlPage(
-                    HtmlParts.GetMoviePage(currentMovie, similarMovies),
+                    HtmlParts.GetMoviePage(currentMovie, similarMovies), 
                     title: currentMovie.Title
                 ));
             }
             else
             {
-                context.Response.Redirect("/notFound");
+                 context.Response.Redirect("/notFound");
             }
         }
         catch (Exception ex)
